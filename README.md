@@ -3,7 +3,7 @@
 ### Acknowledgments
 The Python code is from the short course "Introducing Multimodal Llama 3.2" on the DeepLearning.AI platform. The course content is available for free, while the certificate and graded assessments require a paid subscription.  
 For more details, visit:  
-<>
+<https://learn.deeplearning.ai/courses/introducing-multimodal-llama-3-2/information>
 
 ### Description
 This repository contains only Python code from my practice after each lesson.  
