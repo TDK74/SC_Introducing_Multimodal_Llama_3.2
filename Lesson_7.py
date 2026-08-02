@@ -32,20 +32,19 @@ LLAMA31_8B_INSTRUCT = "meta-llama/Llama-3.1-8B-Instruct"
 
 
 def run_main():
-    client = LlamaStackClient(
-                                base_url = LLAMA_STACK_API_TOGETHER_URL,
-                            )
+    client = LlamaStackClient(base_url = LLAMA_STACK_API_TOGETHER_URL, )
 
-    response = client.inference.chat_completion(
-                model_id = LLAMA31_8B_INSTRUCT,
-                messages = [
-                            {"role": "system", "content": "Who wrote the book Innovator's Dilemma?"
-                            "                               How about Charlotte's Web?"},
-                            {"role": "user", "content": "which book was published first?"}
-                            ],
-                x_llama_stack_provider_data = json.dumps({"together_api_key" :
-                                                            os.getenv('TOGETHER_API_KEY')})
-                )
+    response = client.inference.chat_completion(model_id = LLAMA31_8B_INSTRUCT,
+                                            messages = [{"role" : "system",
+                                                        "content" : ("Who wrote the book "
+                                                                    "Innovator's Dilemma? How about"
+                                                                    "Charlotte's Web?")},
+                                                        {"role" : "user",
+                                                        "content" : ("Which book was "
+                                                                    "published first?")}],
+                                            x_llama_stack_provider_data = json.dumps({
+                                                                    "together_api_key" :
+                                                                    os.getenv('TOGETHER_API_KEY')}))
 
     print(response.completion_message.content)
 
@@ -53,35 +52,21 @@ run_main()
 
 ## ------------------------------------------------------ ##
 async def run_main():
-    client = LlamaStackClient(
-                            base_url = LLAMA_STACK_API_TOGETHER_URL,
-                            )
+    client = LlamaStackClient(base_url = LLAMA_STACK_API_TOGETHER_URL, )
 
-    agent_config = AgentConfig(
-                                model  =  LLAMA31_8B_INSTRUCT,
+    agent_config = AgentConfig(model  =  LLAMA31_8B_INSTRUCT,
                                 instructions = "You are a helpful assistant",
-                                enable_session_persistence = False,
-                                )
+                                enable_session_persistence = False, )
 
     agent = Agent(client, agent_config)
     session_id = agent.create_session("test-session")
 
-    prompts = [
-                "Who wrote the book Charlotte's Web?",
-                "Three best quotes?",
-                ]
+    prompts = ["Who wrote the book Charlotte's Web?", "Three best quotes?", ]
 
     for prompt in prompts:
         print(f"User> {prompt}")
-        response = agent.create_turn(
-                                    messages = [
-                                                {
-                                                "role": "user",
-                                                "content": prompt,
-                                                }
-                                                ],
-                                    session_id = session_id,
-                                    )
+        response = agent.create_turn(messages = [{"role" : "user", "content" : prompt, }],
+                                    session_id = session_id, )
 
         for log in EventLogger().log(response):
             log.print()
@@ -112,80 +97,44 @@ def encode_image(image_path):
 async def run_main(image_path, prompt):
     base64_image = encode_image(image_path)
 
-    client = LlamaStackClient(
-                            base_url = LLAMA_STACK_API_TOGETHER_URL,
-                            )
+    client = LlamaStackClient(base_url = LLAMA_STACK_API_TOGETHER_URL, )
 
-    agent_config = AgentConfig(
-                                model = LLAMA32_11B_INSTRUCT,
+    agent_config = AgentConfig(model = LLAMA32_11B_INSTRUCT,
                                 instructions = "You are a helpful assistant",
-                                enable_session_persistence = False,
-                                )
+                                enable_session_persistence = False, )
 
     agent = Agent(client, agent_config)
     session_id = agent.create_session("test-session")
 
-    response = agent.create_turn(
-                                messages = [{
-                                            "role": "user",
-                                            "content": [
-                                                        {
-                                                        "type": "image",
-                                                        "image": {
-                                                                 "url": {
-                                                                    "uri": encode_image(image_path)
-                                                                    }
-                                                                }
-                                                        },
-                                                        {
-                                                        "type": "text",
-                                                        "text": prompt,
-                                                        }
-                                                    ]
-                                            }],
-                                            session_id = session_id,
-                                )
+    response = agent.create_turn(messages = [{"role" : "user",
+                                            "content" : [{"type" : "image",
+                                                        "image" : {"url" :
+                                                            {"uri" : encode_image(image_path)}}},
+                                                        {"type" : "text", "text" : prompt, }] }],
+                                session_id = session_id, )
 
     for log in EventLogger().log(response):
         log.print()
 
 ## ------------------------------------------------------ ##
 await run_main("./content/Llama_Repo.jpeg",
-                 "How many different colors are those llamas? What are those colors?")
+                "How many different colors are those llamas? What are those colors?")
 
 ## ------------------------------------------------------ ##
 async def run_main(image_path: str, prompt):
-    client = LlamaStackClient(
-                            base_url = LLAMA_STACK_API_TOGETHER_URL,
-                            )
+    client = LlamaStackClient(base_url = LLAMA_STACK_API_TOGETHER_URL, )
 
-    message = {
-                "role": "user",
-                "content": [
-                            {
-                            "type": "image",
-                            "image": {
-                                     "url": {
-                                            "uri": encode_image(image_path)
-                                            }
-                                    }
-                            },
-                            {
-                            "type": "text",
-                            "text": prompt,
-                            }
-                        ]
-            }
+    message = {"role" : "user",
+                "content": [{"type" : "image", "image": {"url": {"uri": encode_image(image_path)}}},
+                            {"type" : "text", "text" : prompt, } ]}
 
     cprint("User> Sending image for analysis...", "green")
-    response = client.inference.chat_completion(
-                                                messages = [message],
+    response = client.inference.chat_completion(messages = [message],
                                                 model_id = LLAMA32_11B_INSTRUCT,
-                                                stream = False,
-                                                )
+                                                stream = False, )
 
     print(response.completion_message.content.lower().strip())
 
 ## ------------------------------------------------------ ##
-await run_main("./content/Llama_Repo.jpeg", "How many different colors are those llamas?\
-                                            What are those colors?")
+await run_main("./content/Llama_Repo.jpeg",
+                "How many different colors are those llamas? What are those colors?")
